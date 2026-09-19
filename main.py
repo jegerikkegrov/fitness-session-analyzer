@@ -22,6 +22,24 @@ class Observation:
         self.activity_level = activity_level
         self.signal_quality = signal_quality
 
+    def is_valid(self):
+        if not valid_heart_rate(self.heart_rate):
+            return False
+
+        if not valid_skin_response(self.skin_response):
+            return False
+
+        if not valid_temperature(self.temperature):
+            return False
+
+        if not valid_activity_level(self.activity_level):
+            return False
+
+        if not valid_signal_quality(self.signal_quality):
+            return False
+
+        return True
+
 
 class FitnessSession:
     def __init__(self, participant):
@@ -102,6 +120,18 @@ for data in observations:
     )
 
     session.add_observation(observation)
+
+valid_count = 0
+invalid_count = 0
+
+for observation in session.observations:
+    if observation.is_valid():
+        valid_count += 1
+    else:
+        invalid_count += 1
+
+print("valid observations:", valid_count)
+print("invalid observations:", invalid_count)
 
 
 print("Participants", session.participant.participant_id)
