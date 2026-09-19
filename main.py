@@ -23,6 +23,14 @@ class Observation:
         self.signal_quality = signal_quality
 
 
+class FitnessSession:
+    def __init__(self, participant):
+        self.participant = participant
+        self.observations = []
+
+    def add_observation(self, observation):
+        self.observations.append(observation)
+
 
 
 profile, observations = generate_fitness_data(
@@ -32,11 +40,21 @@ profile, observations = generate_fitness_data(
     number_of_windows= 12
 )
 
-print(profile)
-print(observations)
+
+reference_profile = ReferenceProfile(
+    profile["baseline_heart_rate"],
+    profile["baseline_skin_response"],
+    profile["baseline_temperature"]
+)
+
+participant = Participant(
+    profile["participant_id"],
+    reference_profile
+)
+
+session = FitnessSession(participant)
 
 
-observation_objects = []
 
 for data in observations:
     observation = Observation(
@@ -48,10 +66,12 @@ for data in observations:
         data["signal_quality"]
     )
 
-    observation_objects.append(observation)
+    session.add_observation(observation)
 
 
-print("Number of observations:", len(observation_objects))
+print("Participants", session.participant.participant_id)
+print("Number of observations:", len(session.observations))
+
 
 
 
