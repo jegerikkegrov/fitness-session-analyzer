@@ -31,6 +31,24 @@ class FitnessSession:
     def add_observation(self, observation):
         self.observations.append(observation)
 
+def valid_heart_rate(heart_rate):
+    if heart_rate is None:
+        return False
+
+    if heart_rate < 35 or heart_rate > 205:
+        return False
+
+    return True
+
+def valid_temperature(temperature):
+    if temperature is None:
+        return False
+
+    if temperature < 25 or temperature > 42:
+        return False
+
+    return True
+
 
 
 profile, observations = generate_fitness_data(
