@@ -34,19 +34,36 @@ class FitnessSession:
 def valid_heart_rate(heart_rate):
     if heart_rate is None:
         return False
-
     if heart_rate < 35 or heart_rate > 205:
         return False
-
     return True
 
 def valid_temperature(temperature):
     if temperature is None:
         return False
-
     if temperature < 25 or temperature > 42:
         return False
+    return True
 
+def valid_activity_level(activity_level):
+    if activity_level is None:
+        return False
+    if activity_level < 0 or activity_level > 1:
+        return False
+    return True
+
+def valid_signal_quality(signal_quality):
+    if signal_quality is None:
+        return False
+    if signal_quality < 0 or signal_quality > 1:
+        return False
+    return True
+
+def valid_skin_response(skin_response):
+    if skin_response is None:
+        return False
+    if skin_response < 0:
+        return False
     return True
 
 
