@@ -108,10 +108,26 @@ def classify_session(average_activity, heart_rate_difference):
 
     return "high activity"
 
+def is_recovering(valid_observations):
+    if len(valid_observations) <4:
+        return False
+
+    first_heart_rate = valid_observations[0].heart_rate
+    last_heart_rate = valid_observations[-1].heart_rate
+
+    first_activity = valid_observations[0].activity_level
+    last_activity = valid_observations[-1].activity_level
+
+    heart_rate_decreased = last_heart_rate < first_heart_rate
+    activity_decreased = last_activity < first_activity
+
+    return heart_rate_decreased and activity_decreased
+
+
 
 profile, observations = generate_fitness_data(
     participant_id= "P001",
-    scenario= "moderate_activity",
+    scenario= "recovery",
     seed= 42,
     number_of_windows= 12
 )
@@ -146,10 +162,12 @@ for data in observations:
 
 valid_count = 0
 invalid_count = 0
+valid_observations = []
 
 for observation in session.observations:
     if observation.is_valid():
         valid_count += 1
+        valid_observations.append(observation)
     else:
         invalid_count += 1
 
@@ -190,12 +208,16 @@ print("heart rate above baseline:", heart_rate_difference)
 
 average_activity = calculate_average(valid_activity_levels)
 
-classification = classify_session(
-    average_activity,
-    heart_rate_difference
-)
+if is_recovering(valid_observations):
+    classification = "recovering"
 
-print("session classification: ", classification)
+else:
+    classification = classify_session(
+        average_activity,
+        heart_rate_difference
+    )
+
+print("session classification:", classification)
 
 
 
