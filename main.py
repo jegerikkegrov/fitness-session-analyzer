@@ -22,6 +22,17 @@ class Observation:
         self.activity_level = activity_level
         self.signal_quality = signal_quality
 
+    @classmethod
+    def from_dict(cls, d):
+        return cls(
+            data["timestamp"],
+            data["heart_rate"],
+            data["skin_response"],
+            data["temperature"],
+            data["activity_level"],
+            data["signal_quality"]
+        )
+
     def is_valid(self):
         if not valid_heart_rate(self.heart_rate):
             return False
@@ -44,10 +55,14 @@ class Observation:
 class FitnessSession:
     def __init__(self, participant):
         self.participant = participant
-        self.observations = []
+        self._observations = []
 
     def add_observation(self, observation):
-        self.observations.append(observation)
+        self._observations.append(observation)
+
+    @property
+    def observations(self):
+        return self._observations
 
 def valid_heart_rate(heart_rate):
     if heart_rate is None:
@@ -149,15 +164,7 @@ session = FitnessSession(participant)
 
 
 for data in observations:
-    observation = Observation(
-        data["timestamp"],
-        data["heart_rate"],
-        data["skin_response"],
-        data["temperature"],
-        data["activity_level"],
-        data["signal_quality"]
-    )
-
+    observation = Observation.from_dict(data)
     session.add_observation(observation)
 
 valid_count = 0
