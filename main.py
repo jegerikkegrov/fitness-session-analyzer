@@ -127,7 +127,7 @@ def is_recovering(valid_observations):
 
 profile, observations = generate_fitness_data(
     participant_id= "P001",
-    scenario= "recovery",
+    scenario= "poor_quality",
     seed= 42,
     number_of_windows= 12
 )
@@ -201,14 +201,22 @@ print("Average activity level:", calculate_average(valid_activity_levels))
 average_heart_rate = calculate_average(valid_heart_rates)
 baseline_heart_rate = session.participant.reference_profile.baseline_heart_rate
 
-heart_rate_difference = (average_heart_rate - baseline_heart_rate)
+
+if average_heart_rate is None:
+    heart_rate_difference = None
+else:
+    heart_rate_difference = (average_heart_rate - baseline_heart_rate)
 
 print("baseline heart rate:", baseline_heart_rate)
 print("heart rate above baseline:", heart_rate_difference)
 
 average_activity = calculate_average(valid_activity_levels)
 
-if is_recovering(valid_observations):
+
+if len(valid_observations) < 4:
+    classification = "insufficient data"
+
+elif is_recovering(valid_observations):
     classification = "recovering"
 
 else:
