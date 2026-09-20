@@ -100,7 +100,13 @@ def calculate_maximum(values):
         return None
     return max(values)
 
+def classify_session(average_activity, heart_rate_difference):
+    if average_activity < 0.3 and heart_rate_difference < 20:
+        return "resting"
+    if average_activity < 0.68 and heart_rate_difference < 50:
+        return "moderate activity"
 
+    return "high activity"
 
 
 profile, observations = generate_fitness_data(
@@ -181,6 +187,15 @@ heart_rate_difference = (average_heart_rate - baseline_heart_rate)
 
 print("baseline heart rate:", baseline_heart_rate)
 print("heart rate above baseline:", heart_rate_difference)
+
+average_activity = calculate_average(valid_activity_levels)
+
+classification = classify_session(
+    average_activity,
+    heart_rate_difference
+)
+
+print("session classification: ", classification)
 
 
 
