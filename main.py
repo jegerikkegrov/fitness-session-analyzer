@@ -84,6 +84,23 @@ def valid_skin_response(skin_response):
         return False
     return True
 
+def calculate_average(values):
+    if len(values) == 0:
+        return None
+    return sum(values) / len(values)
+
+def calculate_minimum(values):
+    if len(values) == 0:
+        return None
+
+    return min(values)
+
+def calculate_maximum(values):
+    if len(values) == 0:
+        return None
+    return max(values)
+
+
 
 
 profile, observations = generate_fitness_data(
@@ -130,12 +147,25 @@ for observation in session.observations:
     else:
         invalid_count += 1
 
+
 print("valid observations:", valid_count)
 print("invalid observations:", invalid_count)
 
 
 print("Participants", session.participant.participant_id)
 print("Number of observations:", len(session.observations))
+
+valid_heart_rates = []
+
+for observation in session.observations:
+    if observation.is_valid():
+        valid_heart_rates.append(observation.heart_rate)
+
+
+print("Average heart rate:", calculate_average(valid_heart_rates))
+print("Minimum heart rate:", calculate_minimum(valid_heart_rates))
+print("Maximum heart rate:", calculate_maximum(valid_heart_rates))
+
 
 
 
