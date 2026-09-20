@@ -166,11 +166,21 @@ print("Average heart rate:", calculate_average(valid_heart_rates))
 print("Minimum heart rate:", calculate_minimum(valid_heart_rates))
 print("Maximum heart rate:", calculate_maximum(valid_heart_rates))
 
+valid_activity_levels = []
 
+for observation in session.observations:
+    if observation.is_valid():
+        valid_activity_levels.append(observation.activity_level)
 
+print("Average activity level:", calculate_average(valid_activity_levels))
 
+average_heart_rate = calculate_average(valid_heart_rates)
+baseline_heart_rate = session.participant.reference_profile.baseline_heart_rate
 
+heart_rate_difference = (average_heart_rate - baseline_heart_rate)
 
+print("baseline heart rate:", baseline_heart_rate)
+print("heart rate above baseline:", heart_rate_difference)
 
 
 
