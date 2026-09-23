@@ -138,6 +138,18 @@ def is_recovering(valid_observations):
 
     return heart_rate_decreased and activity_decreased
 
+def create_explanation(classification):
+    if classification == "resting":
+        return "Low activity and heart rate close to baseline"
+    if classification == "moderate activity":
+        return "Moderate activity and heart rate are moderately elevated"
+    if classification == "high activity":
+        return "High activity and heart rate are strongly elevated"
+    if classification == "recovering":
+        return "Heart rate and activity decreased during the session"
+    return "Not enough valid observations available"
+
+
 def create_result(
         session,
         classification,
@@ -152,6 +164,7 @@ def create_result(
     return {
         "participant_id": session.participant.participant_id,
         "classification": classification,
+        "explanation": create_explanation(classification),
         "valid_observations": valid_count,
         "invalid_observations": invalid_count,
         "average_heart_rate": average_heart_rate,
@@ -167,6 +180,7 @@ def print_report(result):
     print("----- FITNESS SESSION REPORT -----")
     print("Participant:", result["participant_id"])
     print("Classification:", result["classification"])
+    print("Explanation:", result["explanation"])
     print("valid observations:", result["valid_observations"])
     print("invalid observations:", result["invalid_observations"])
     print()
