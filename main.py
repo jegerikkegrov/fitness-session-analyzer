@@ -162,6 +162,28 @@ def create_result(
         "average_activity": average_activity,
     }
 
+def print_report(result):
+    print()
+    print("----- FITNESS SESSION REPORT -----")
+    print("Participant:", result["participant_id"])
+    print("Classification:", result["classification"])
+    print("valid observations:", result["valid_observations"])
+    print("invalid observations:", result["invalid_observations"])
+    print()
+    print("Average heart rate:", display_value(result["average_heart_rate"]))
+    print("Minimum heart rate:", display_value(result["minimum_heart_rate"]))
+    print("Maximum heart rate:", display_value(result["maximum_heart_rate"]))
+    print("Baseline heart rate:", display_value(result["baseline_heart_rate"]))
+    print("heart rate difference:", display_value(result["heart_rate_difference"]))
+    print("Average activity:", display_value(result["average_activity"]))
+    print("----------------------------------")
+
+def display_value(value):
+        if value is None:
+            return "N/A"
+        return value
+
+
 profile, observations = generate_fitness_data(
     participant_id= "P001",
     scenario= "poor_quality",
@@ -268,8 +290,7 @@ results = create_result(
     average_activity
 )
 
-print("results:", results)
-
+print_report(results)
 
 
 
