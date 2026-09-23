@@ -62,7 +62,7 @@ class FitnessSession:
 
     @property
     def observations(self):
-        return self._observations
+        return self._observations.copy()
 
 def valid_heart_rate(heart_rate):
     if heart_rate is None:
