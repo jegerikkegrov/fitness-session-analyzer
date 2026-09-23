@@ -259,6 +259,6 @@ def display_value(value):
         return value
 
 if __name__ == "__main__":
-    results = analyze_session("moderate_activity")
+    results = analyze_session("poor_quality")
     print_report(results)
 
