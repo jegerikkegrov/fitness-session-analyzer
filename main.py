@@ -23,7 +23,7 @@ class Observation:
         self.signal_quality = signal_quality
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, data):
         return cls(
             data["timestamp"],
             data["heart_rate"],
@@ -178,119 +178,87 @@ def print_report(result):
     print("Average activity:", display_value(result["average_activity"]))
     print("----------------------------------")
 
+def analyze_session(scenario):
+    profile, observations = generate_fitness_data(
+        participant_id= "P001",
+        scenario= scenario,
+        seed=42,
+        number_of_windows= 12
+    )
+    reference_profile = ReferenceProfile(
+        profile["baseline_heart_rate"],
+        profile["baseline_skin_response"],
+        profile["baseline_temperature"]
+    )
+    participant = Participant(
+        profile["participant_id"],
+        reference_profile
+    )
+
+    session = FitnessSession(participant)
+
+    for data in observations:
+        observation = Observation.from_dict(data)
+        session.add_observation(observation)
+
+    valid_count = 0
+    invalid_count = 0
+    valid_observations = []
+
+    for observations in session.observations:
+        if observations.is_valid():
+            valid_count += 1
+            valid_observations.append(observations)
+        else:
+            invalid_count +=1
+
+    valid_heart_rates = []
+    valid_activity_levels = []
+
+    for observations in valid_observations:
+        valid_heart_rates.append(observations.heart_rate)
+        valid_activity_levels.append(observations.activity_level)
+
+    average_heart_rate = calculate_average(valid_heart_rates)
+    average_activity = calculate_average(valid_activity_levels)
+
+    baseline_heart_rate = session.participant.reference_profile.baseline_heart_rate
+
+    if average_heart_rate is None:
+        heart_rate_difference = None
+    else:
+        heart_rate_difference = average_heart_rate - baseline_heart_rate
+
+    if len(valid_observations) < 4:
+        classification = "insufficient data"
+    elif is_recovering(valid_observations):
+        classification = "recovering"
+    else:
+        classification = classify_session(
+            average_activity,
+            heart_rate_difference,
+        )
+
+    results = create_result(
+        session,
+        classification,
+        valid_count,
+        invalid_count,
+        average_heart_rate,
+        valid_heart_rates,
+        baseline_heart_rate,
+        heart_rate_difference,
+        average_activity
+    )
+    return results
+
+
 def display_value(value):
         if value is None:
             return "N/A"
         return value
 
-
-profile, observations = generate_fitness_data(
-    participant_id= "P001",
-    scenario= "poor_quality",
-    seed= 42,
-    number_of_windows= 12
-)
-
-
-reference_profile = ReferenceProfile(
-    profile["baseline_heart_rate"],
-    profile["baseline_skin_response"],
-    profile["baseline_temperature"]
-)
-
-participant = Participant(
-    profile["participant_id"],
-    reference_profile
-)
-
-session = FitnessSession(participant)
-
-
-
-for data in observations:
-    observation = Observation.from_dict(data)
-    session.add_observation(observation)
-
-valid_count = 0
-invalid_count = 0
-valid_observations = []
-
-for observation in session.observations:
-    if observation.is_valid():
-        valid_count += 1
-        valid_observations.append(observation)
-    else:
-        invalid_count += 1
-
-
-print("valid observations:", valid_count)
-print("invalid observations:", invalid_count)
-
-
-print("Participants", session.participant.participant_id)
-print("Number of observations:", len(session.observations))
-
-valid_heart_rates = []
-
-for observation in session.observations:
-    if observation.is_valid():
-        valid_heart_rates.append(observation.heart_rate)
-
-
-print("Average heart rate:", calculate_average(valid_heart_rates))
-print("Minimum heart rate:", calculate_minimum(valid_heart_rates))
-print("Maximum heart rate:", calculate_maximum(valid_heart_rates))
-
-valid_activity_levels = []
-
-for observation in session.observations:
-    if observation.is_valid():
-        valid_activity_levels.append(observation.activity_level)
-
-print("Average activity level:", calculate_average(valid_activity_levels))
-
-average_heart_rate = calculate_average(valid_heart_rates)
-baseline_heart_rate = session.participant.reference_profile.baseline_heart_rate
-
-
-if average_heart_rate is None:
-    heart_rate_difference = None
-else:
-    heart_rate_difference = (average_heart_rate - baseline_heart_rate)
-
-print("baseline heart rate:", baseline_heart_rate)
-print("heart rate above baseline:", heart_rate_difference)
-
-average_activity = calculate_average(valid_activity_levels)
-
-
-if len(valid_observations) < 4:
-    classification = "insufficient data"
-
-elif is_recovering(valid_observations):
-    classification = "recovering"
-
-else:
-    classification = classify_session(
-        average_activity,
-        heart_rate_difference
-    )
-
-print("session classification:", classification)
-
-results = create_result(
-    session,
-    classification,
-    valid_count,
-    invalid_count,
-    average_heart_rate,
-    valid_heart_rates,
-    baseline_heart_rate,
-    heart_rate_difference,
-    average_activity
-)
-
-print_report(results)
-
-
+if __name__ == "__main__":
+    results = analyze_session("moderate_activity")
+    print_report(results)
 
