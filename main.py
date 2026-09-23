@@ -138,7 +138,29 @@ def is_recovering(valid_observations):
 
     return heart_rate_decreased and activity_decreased
 
-
+def create_result(
+        session,
+        classification,
+        valid_count,
+        invalid_count,
+        average_heart_rate,
+        valid_heart_rates,
+        baseline_heart_rate,
+        heart_rate_difference,
+        average_activity
+):
+    return {
+        "participant_id": session.participant.participant_id,
+        "classification": classification,
+        "valid_observations": valid_count,
+        "invalid_observations": invalid_count,
+        "average_heart_rate": average_heart_rate,
+        "minimum_heart_rate": calculate_minimum(valid_heart_rates),
+        "maximum_heart_rate": calculate_maximum(valid_heart_rates),
+        "baseline_heart_rate": baseline_heart_rate,
+        "heart_rate_difference": heart_rate_difference,
+        "average_activity": average_activity,
+    }
 
 profile, observations = generate_fitness_data(
     participant_id= "P001",
@@ -234,8 +256,19 @@ else:
 
 print("session classification:", classification)
 
+results = create_result(
+    session,
+    classification,
+    valid_count,
+    invalid_count,
+    average_heart_rate,
+    valid_heart_rates,
+    baseline_heart_rate,
+    heart_rate_difference,
+    average_activity
+)
 
-
+print("results:", results)
 
 
 
